@@ -63,10 +63,10 @@ app.use('/api/admin', adminRoutes);
 
 // Health check
 app.get('/health', (req, res) => {
-  res.status(200).json({ 
-    status: 'OK', 
+  res.status(200).json({
+    status: 'OK',
     timestamp: new Date().toISOString(),
-    service: 'Negus Backend API'
+    service: 'Yoru\'s Random Test Platform Backend API'
   });
 });
 
@@ -90,7 +90,7 @@ io.on('connection', (socket) => {
 const PORT = process.env.PORT || 3001;
 
 server.listen(PORT, () => {
-  logger.info(`🚀 Negus Backend Server running on port ${PORT}`);
+  logger.info(`🚀 Yoru's Random Test Platform Backend Server running on port ${PORT}`);
   logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
   logger.info(`🌐 CORS enabled for: ${process.env.FRONTEND_URL}`);
 });

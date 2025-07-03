@@ -1,6 +1,6 @@
-# Negus Frontend
+# Yoru's Random Test Platform Frontend
 
-React.js frontend for the Negus professional services platform.
+React.js frontend for the Yoru's Random Test Platform professional services platform.
 
 ## 🚀 Features
 

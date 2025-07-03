@@ -1,7 +1,7 @@
 {
-  "name": "negus-frontend",
+  "name": "yoru-test-platform-frontend",
   "version": "1.0.0",
-  "description": "Negus Platform Frontend",
+  "description": "Yoru's Random Test Platform Frontend",
   "private": true,
   "type": "module",
   "scripts": {

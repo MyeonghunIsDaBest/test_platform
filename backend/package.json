@@ -1,7 +1,7 @@
 {
-  "name": "negus-backend",
+  "name": "yoru-test-platform-backend",
   "version": "1.0.0",
-  "description": "Negus Platform Backend API",
+  "description": "Yoru's Random Test Platform Backend API",
   "main": "dist/server.js",
   "scripts": {
     "dev": "nodemon src/server.ts",
@@ -15,8 +15,8 @@
     "db:studio": "prisma studio",
     "seed": "ts-node scripts/seed.ts"
   },
-  "keywords": ["negus", "marketplace", "api", "nodejs", "express"],
-  "author": "Negus Development Team",
+  "keywords": ["yoru", "test-platform", "api", "nodejs", "express"],
+  "author": "Yoru Development Team",
   "license": "MIT",
   "dependencies": {
     "@prisma/client": "^5.7.1",

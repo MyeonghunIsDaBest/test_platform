@@ -172,7 +172,7 @@ const HomePage: React.FC = () => {
         {/* Features Section */}
         <Box sx={{ mb: 8 }}>
           <Typography variant="h3" component="h2" textAlign="center" gutterBottom>
-            Why Choose Negus?
+            Why Choose Yoru's Random Test Platform?
           </Typography>
           <Typography variant="h6" textAlign="center" color="text.secondary" paragraph>
             We make it easy to connect with the right professionals
@@ -266,7 +266,7 @@ const HomePage: React.FC = () => {
             Ready to Get Started?
           </Typography>
           <Typography variant="h6" paragraph sx={{ opacity: 0.9 }}>
-            Join thousands of satisfied customers and professionals on Negus
+            Join thousands of satisfied customers and professionals on Yoru's Random Test Platform
           </Typography>
           <Box sx={{ mt: 4, display: 'flex', gap: 2, justifyContent: 'center', flexWrap: 'wrap' }}>
             <Button

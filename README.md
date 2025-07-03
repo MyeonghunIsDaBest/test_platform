@@ -1,4 +1,4 @@
-# Negus Platform
+# Yoru's Random Test Platform
 
 A modern professional services marketplace built with React.js and Node.js, converted from the original Gigant WordPress theme.
 
@@ -37,7 +37,7 @@ A modern professional services marketplace built with React.js and Node.js, conv
 ## 📁 Project Structure
 
 ```
-Negus/development/
+YoruTestPlatform/development/
 ├── backend/
 │   ├── config/          # Configuration files
 │   ├── controllers/     # Route controllers
@@ -178,4 +178,4 @@ This project is licensed under the MIT License - see the [LICENSE](LICENSE) file
 
 ## 🆘 Support
 
-For support, email support@negus.com or create an issue in this repository.
+For support, email support@yoru-test-platform.com or create an issue in this repository.

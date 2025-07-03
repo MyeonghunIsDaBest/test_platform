@@ -124,7 +124,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, loading = false, 
               Choose your account type
             </Typography>
             <Typography variant="body2" color="text.secondary" paragraph>
-              Select how you plan to use Negus
+              Select how you plan to use Yoru's Random Test Platform
             </Typography>
             
             <Controller
@@ -368,7 +368,7 @@ const RegisterForm: React.FC<RegisterFormProps> = ({ onSubmit, loading = false, 
         <CardContent sx={{ p: 4 }}>
           <Box textAlign="center" mb={3}>
             <Typography variant="h4" component="h1" gutterBottom color="primary">
-              Negus
+              Yoru's Test Platform
             </Typography>
             <Typography variant="h6" color="text.secondary">
               Create your account

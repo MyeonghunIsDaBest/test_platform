@@ -98,7 +98,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
     <Box>
       <Toolbar>
         <Typography variant="h6" noWrap component="div">
-          Negus
+          Yoru's Test Platform
         </Typography>
       </Toolbar>
       <List>
@@ -146,7 +146,7 @@ const Layout: React.FC<LayoutProps> = ({ children }) => {
           </IconButton>
           
           <Typography variant="h6" noWrap component="div" sx={{ flexGrow: 1 }}>
-            Negus Platform
+            Yoru's Random Test Platform
           </Typography>
 
           <IconButton color="inherit" sx={{ mr: 1 }}>

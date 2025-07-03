@@ -79,7 +79,7 @@ const LoginForm: React.FC<LoginFormProps> = ({ onSubmit, loading = false, error 
         <CardContent sx={{ p: 4 }}>
           <Box textAlign="center" mb={3}>
             <Typography variant="h4" component="h1" gutterBottom color="primary">
-              Negus
+              Yoru's Test Platform
             </Typography>
             <Typography variant="h6" color="text.secondary">
               Welcome back
