@@ -1,4 +1,4 @@
-# Negus Platform
+# Test Platform
 
 A modern professional services marketplace built with React.js and Node.js, converted from the original Gigant WordPress theme.
 
