@@ -6,7 +6,7 @@ generator client {
 }
 
 datasource db {
-  provider = "postgresql"
+  provider = "mysql"
   url      = env("DATABASE_URL")
 }
 
@@ -42,7 +42,6 @@ model User {
 
   // Professional relationships
   professionalAppointments Appointment[] @relation("ProfessionalAppointments")
-  professionalTransactions Transaction[] @relation("ProfessionalTransactions")
   professionalMessages     Message[]     @relation("ProfessionalMessages")
   professionalReviews      Review[]      @relation("ProfessionalReviews")
 
@@ -86,7 +85,7 @@ model Professional {
   user         User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
   hourlyRate   Decimal                     @db.Decimal(10, 2)
   experience   String
-  skills       String[]
+  skills       String   @db.Text
   rating       Decimal                     @default(0) @db.Decimal(3, 2)
   totalReviews Int                         @default(0)
   status       ProfessionalStatus          @default(PENDING)
@@ -96,7 +95,6 @@ model Professional {
 
   // Relationships
   listings     Listing[]
-  appointments Appointment[] @relation("ProfessionalAppointments")
 
   @@map("professionals")
 }
