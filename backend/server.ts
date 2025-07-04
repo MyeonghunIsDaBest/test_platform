@@ -7,6 +7,10 @@ import { createServer } from 'http';
 import { Server } from 'socket.io';
 import dotenv from 'dotenv';
 
+// Import database and utilities
+import { connectDatabase, disconnectDatabase } from './config/database';
+import { logger } from './utils/logger';
+
 // Import routes
 import authRoutes from './routes/auth';
 import userRoutes from './routes/users';
@@ -15,11 +19,11 @@ import listingRoutes from './routes/listings';
 import appointmentRoutes from './routes/appointments';
 import paymentRoutes from './routes/payments';
 import messageRoutes from './routes/messages';
+import reviewRoutes from './routes/reviews';
 import adminRoutes from './routes/admin';
 
 // Import middleware
 import { errorHandler } from './middleware/errorHandler';
-import { logger } from './utils/logger';
 
 // Load environment variables
 dotenv.config();
@@ -59,6 +63,7 @@ app.use('/api/listings', listingRoutes);
 app.use('/api/appointments', appointmentRoutes);
 app.use('/api/payments', paymentRoutes);
 app.use('/api/messages', messageRoutes);
+app.use('/api/reviews', reviewRoutes);
 app.use('/api/admin', adminRoutes);
 
 // Health check
@@ -89,10 +94,38 @@ io.on('connection', (socket) => {
 
 const PORT = process.env.PORT || 3001;
 
-server.listen(PORT, () => {
-  logger.info(`🚀 Yoru's Random Test Platform Backend Server running on port ${PORT}`);
-  logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
-  logger.info(`🌐 CORS enabled for: ${process.env.FRONTEND_URL}`);
+// Start server with database connection
+const startServer = async () => {
+  try {
+    // Connect to database
+    await connectDatabase();
+
+    // Start HTTP server
+    server.listen(PORT, () => {
+      logger.info(`🚀 Yoru's Random Test Platform Backend Server running on port ${PORT}`);
+      logger.info(`📊 Environment: ${process.env.NODE_ENV}`);
+      logger.info(`🌐 CORS enabled for: ${process.env.FRONTEND_URL}`);
+    });
+  } catch (error) {
+    logger.error('Failed to start server:', error);
+    process.exit(1);
+  }
+};
+
+// Graceful shutdown
+process.on('SIGTERM', async () => {
+  logger.info('SIGTERM received, shutting down gracefully');
+  await disconnectDatabase();
+  process.exit(0);
 });
+
+process.on('SIGINT', async () => {
+  logger.info('SIGINT received, shutting down gracefully');
+  await disconnectDatabase();
+  process.exit(0);
+});
+
+// Start the server
+startServer();
 
 export { io };

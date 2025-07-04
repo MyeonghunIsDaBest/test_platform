@@ -1,61 +1,72 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/errorHandler';
+import { validate, schemas } from '../middleware/validation';
+import { authenticateToken } from '../middleware/auth';
+import {
+  getProfile,
+  updateProfile,
+  uploadAvatar,
+  changePassword,
+  deleteAccount,
+  getNotifications,
+  markNotificationsAsRead,
+  getUserStats,
+} from '../controllers/userController';
 
 const router = express.Router();
+
+// All routes require authentication
+router.use(authenticateToken);
 
 // @desc    Get user profile
 // @route   GET /api/users/profile
 // @access  Private
-router.get('/profile', asyncHandler(async (req, res) => {
-  // TODO: Implement get user profile
-  res.status(200).json({
-    success: true,
-    message: 'Get user profile endpoint - to be implemented'
-  });
-}));
+router.get('/profile', getProfile);
 
 // @desc    Update user profile
 // @route   PUT /api/users/profile
 // @access  Private
-router.put('/profile', asyncHandler(async (req, res) => {
-  // TODO: Implement update user profile
-  res.status(200).json({
-    success: true,
-    message: 'Update user profile endpoint - to be implemented'
-  });
-}));
+router.put(
+  '/profile',
+  validate({ body: schemas.updateProfile }),
+  updateProfile
+);
 
 // @desc    Upload profile picture
 // @route   POST /api/users/avatar
 // @access  Private
-router.post('/avatar', asyncHandler(async (req, res) => {
-  // TODO: Implement profile picture upload
-  res.status(200).json({
-    success: true,
-    message: 'Upload avatar endpoint - to be implemented'
-  });
-}));
+router.post('/avatar', uploadAvatar);
 
 // @desc    Change password
 // @route   PUT /api/users/change-password
 // @access  Private
-router.put('/change-password', asyncHandler(async (req, res) => {
-  // TODO: Implement change password
-  res.status(200).json({
-    success: true,
-    message: 'Change password endpoint - to be implemented'
-  });
-}));
+router.put(
+  '/change-password',
+  validate({ body: schemas.changePassword }),
+  changePassword
+);
 
 // @desc    Delete user account
 // @route   DELETE /api/users/account
 // @access  Private
-router.delete('/account', asyncHandler(async (req, res) => {
-  // TODO: Implement delete account
-  res.status(200).json({
-    success: true,
-    message: 'Delete account endpoint - to be implemented'
-  });
-}));
+router.delete('/account', deleteAccount);
+
+// @desc    Get user notifications
+// @route   GET /api/users/notifications
+// @access  Private
+router.get(
+  '/notifications',
+  validate({ query: schemas.pagination }),
+  getNotifications
+);
+
+// @desc    Mark notifications as read
+// @route   PUT /api/users/notifications/read
+// @access  Private
+router.put('/notifications/read', markNotificationsAsRead);
+
+// @desc    Get user statistics
+// @route   GET /api/users/stats
+// @access  Private
+router.get('/stats', getUserStats);
 
 export default router;

@@ -1,0 +1,352 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  email     String   @unique
+  firstName String
+  lastName  String
+  phone     String?
+  avatar    String?
+  role      UserRole @default(CUSTOMER)
+  onlineStatus OnlineStatus @default(OFFLINE)
+  emailVerified Boolean @default(false)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Password and authentication
+  password  String
+  refreshTokens RefreshToken[]
+
+  // Profile
+  profile   UserProfile?
+
+  // Professional data (if role is PROFESSIONAL)
+  professional Professional?
+
+  // Customer relationships
+  customerAppointments Appointment[] @relation("CustomerAppointments")
+  customerTransactions Transaction[] @relation("CustomerTransactions")
+  customerMessages     Message[]     @relation("CustomerMessages")
+  customerReviews      Review[]      @relation("CustomerReviews")
+
+  // Professional relationships
+  professionalAppointments Appointment[] @relation("ProfessionalAppointments")
+  professionalTransactions Transaction[] @relation("ProfessionalTransactions")
+  professionalMessages     Message[]     @relation("ProfessionalMessages")
+  professionalReviews      Review[]      @relation("ProfessionalReviews")
+
+  // Wallet
+  wallet    Wallet?
+
+  // Notifications
+  notifications Notification[]
+
+  @@map("users")
+}
+
+model RefreshToken {
+  id        String   @id @default(cuid())
+  token     String   @unique
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  expiresAt DateTime
+  createdAt DateTime @default(now())
+
+  @@map("refresh_tokens")
+}
+
+model UserProfile {
+  id               String             @id @default(cuid())
+  userId           String             @unique
+  user             User               @relation(fields: [userId], references: [id], onDelete: Cascade)
+  bio              String?
+  location         String?
+  timezone         String?
+  verificationStatus VerificationStatus @default(PENDING)
+  createdAt        DateTime           @default(now())
+  updatedAt        DateTime           @updatedAt
+
+  @@map("user_profiles")
+}
+
+model Professional {
+  id           String                      @id @default(cuid())
+  userId       String                      @unique
+  user         User                        @relation(fields: [userId], references: [id], onDelete: Cascade)
+  hourlyRate   Decimal                     @db.Decimal(10, 2)
+  experience   String
+  skills       String[]
+  rating       Decimal                     @default(0) @db.Decimal(3, 2)
+  totalReviews Int                         @default(0)
+  status       ProfessionalStatus          @default(PENDING)
+  verifications ProfessionalVerifications?
+  createdAt    DateTime                    @default(now())
+  updatedAt    DateTime                    @updatedAt
+
+  // Relationships
+  listings     Listing[]
+  appointments Appointment[] @relation("ProfessionalAppointments")
+
+  @@map("professionals")
+}
+
+model ProfessionalVerifications {
+  id                String       @id @default(cuid())
+  professionalId    String       @unique
+  professional      Professional @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  identityVerified  Boolean      @default(false)
+  contactVerified   Boolean      @default(false)
+  emailVerified     Boolean      @default(false)
+  facebookVerified  Boolean      @default(false)
+  linkedinVerified  Boolean      @default(false)
+  createdAt         DateTime     @default(now())
+  updatedAt         DateTime     @updatedAt
+
+  @@map("professional_verifications")
+}
+
+model Category {
+  id          String    @id @default(cuid())
+  name        String    @unique
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  // Relationships
+  listings    Listing[]
+
+  @@map("categories")
+}
+
+model Listing {
+  id             String            @id @default(cuid())
+  professionalId String
+  professional   Professional      @relation(fields: [professionalId], references: [id], onDelete: Cascade)
+  title          String
+  description    String
+  categoryId     String
+  category       Category          @relation(fields: [categoryId], references: [id])
+  price          Decimal           @db.Decimal(10, 2)
+  duration       Int               // in minutes
+  status         ListingStatus     @default(DRAFT)
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  // Relationships
+  availability   ListingAvailability[]
+  appointments   Appointment[]
+
+  @@map("listings")
+}
+
+model ListingAvailability {
+  id          String    @id @default(cuid())
+  listingId   String
+  listing     Listing   @relation(fields: [listingId], references: [id], onDelete: Cascade)
+  dayOfWeek   Int       // 0-6 (Sunday-Saturday)
+  startTime   String    // HH:mm format
+  endTime     String    // HH:mm format
+  breakTimes  Json?     // Array of {startTime, endTime} objects
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  @@map("listing_availability")
+}
+
+model Appointment {
+  id             String            @id @default(cuid())
+  customerId     String
+  customer       User              @relation("CustomerAppointments", fields: [customerId], references: [id])
+  professionalId String
+  professional   User              @relation("ProfessionalAppointments", fields: [professionalId], references: [id])
+  listingId      String
+  listing        Listing           @relation(fields: [listingId], references: [id])
+  scheduledDate  DateTime
+  scheduledTime  String            // HH:mm format
+  status         AppointmentStatus @default(PENDING)
+  notes          String?
+  zoomMeetingId  String?
+  createdAt      DateTime          @default(now())
+  updatedAt      DateTime          @updatedAt
+
+  // Relationships
+  extensions     AppointmentExtension[]
+  transactions   Transaction[]
+  messages       Message[]
+  reviews        Review[]
+
+  @@map("appointments")
+}
+
+model AppointmentExtension {
+  id                String            @id @default(cuid())
+  appointmentId     String
+  appointment       Appointment       @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  additionalMinutes Int
+  additionalCost    Decimal           @db.Decimal(10, 2)
+  status            ExtensionStatus   @default(PENDING)
+  createdAt         DateTime          @default(now())
+
+  @@map("appointment_extensions")
+}
+
+model Wallet {
+  id        String   @id @default(cuid())
+  userId    String   @unique
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  balance   Decimal  @default(0) @db.Decimal(10, 2)
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  // Relationships
+  transactions Transaction[]
+
+  @@map("wallets")
+}
+
+model Transaction {
+  id            String            @id @default(cuid())
+  userId        String
+  user          User              @relation("CustomerTransactions", fields: [userId], references: [id])
+  walletId      String
+  wallet        Wallet            @relation(fields: [walletId], references: [id])
+  amount        Decimal           @db.Decimal(10, 2)
+  type          TransactionType
+  status        TransactionStatus @default(PENDING)
+  appointmentId String?
+  appointment   Appointment?      @relation(fields: [appointmentId], references: [id])
+  platformFee   Decimal?          @db.Decimal(10, 2)
+  description   String
+  externalId    String?           // For payment gateway reference
+  createdAt     DateTime          @default(now())
+
+  @@map("transactions")
+}
+
+model Message {
+  id            String      @id @default(cuid())
+  senderId      String
+  sender        User        @relation("CustomerMessages", fields: [senderId], references: [id])
+  receiverId    String
+  receiver      User        @relation("ProfessionalMessages", fields: [receiverId], references: [id])
+  appointmentId String?
+  appointment   Appointment? @relation(fields: [appointmentId], references: [id])
+  content       String
+  fileUrl       String?
+  isRead        Boolean     @default(false)
+  createdAt     DateTime    @default(now())
+
+  @@map("messages")
+}
+
+model Review {
+  id            String      @id @default(cuid())
+  appointmentId String      @unique
+  appointment   Appointment @relation(fields: [appointmentId], references: [id], onDelete: Cascade)
+  reviewerId    String
+  reviewer      User        @relation("CustomerReviews", fields: [reviewerId], references: [id])
+  revieweeId    String
+  reviewee      User        @relation("ProfessionalReviews", fields: [revieweeId], references: [id])
+  rating        Int         // 1-5
+  comment       String
+  createdAt     DateTime    @default(now())
+
+  @@map("reviews")
+}
+
+model Notification {
+  id        String           @id @default(cuid())
+  userId    String
+  user      User             @relation(fields: [userId], references: [id], onDelete: Cascade)
+  type      NotificationType
+  title     String
+  content   String
+  isRead    Boolean          @default(false)
+  createdAt DateTime         @default(now())
+
+  @@map("notifications")
+}
+
+// Enums
+enum UserRole {
+  CUSTOMER
+  PROFESSIONAL
+  ADMIN
+}
+
+enum OnlineStatus {
+  ONLINE
+  OFFLINE
+}
+
+enum VerificationStatus {
+  PENDING
+  VERIFIED
+  REJECTED
+}
+
+enum ProfessionalStatus {
+  PENDING
+  ACTIVE
+  SUSPENDED
+  REJECTED
+}
+
+enum ListingStatus {
+  DRAFT
+  ACTIVE
+  PAUSED
+  ARCHIVED
+}
+
+enum AppointmentStatus {
+  PENDING
+  CONFIRMED
+  IN_PROGRESS
+  COMPLETED
+  CANCELLED
+  NO_SHOW
+}
+
+enum ExtensionStatus {
+  PENDING
+  APPROVED
+  REJECTED
+}
+
+enum TransactionType {
+  TOPUP
+  PAYMENT
+  REFUND
+  WITHDRAWAL
+  FEE
+  EARNING
+}
+
+enum TransactionStatus {
+  PENDING
+  COMPLETED
+  FAILED
+  CANCELLED
+}
+
+enum NotificationType {
+  APPOINTMENT_BOOKED
+  APPOINTMENT_CONFIRMED
+  APPOINTMENT_CANCELLED
+  PAYMENT_RECEIVED
+  MESSAGE_RECEIVED
+  REVIEW_RECEIVED
+  VERIFICATION_UPDATE
+}

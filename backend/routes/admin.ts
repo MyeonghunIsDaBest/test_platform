@@ -1,66 +1,86 @@
 import express from 'express';
-import { asyncHandler } from '../middleware/errorHandler';
+import { validate, schemas } from '../middleware/validation';
+import { authenticateToken, requireAdmin } from '../middleware/auth';
+import {
+  getDashboardStats,
+  getAllUsers,
+  updateUserStatus,
+  getAllAppointments,
+  getAllTransactions,
+  updateProfessionalStatus,
+  getSystemSettings,
+  updateSystemSettings,
+} from '../controllers/adminController';
 
 const router = express.Router();
+
+// All routes require admin authentication
+router.use(authenticateToken);
+router.use(requireAdmin);
 
 // @desc    Get dashboard stats
 // @route   GET /api/admin/dashboard
 // @access  Private (Admin only)
-router.get('/dashboard', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Admin dashboard endpoint - to be implemented'
-  });
-}));
+router.get('/dashboard', getDashboardStats);
 
 // @desc    Get all users
 // @route   GET /api/admin/users
 // @access  Private (Admin only)
-router.get('/users', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Get all users endpoint - to be implemented'
-  });
-}));
+router.get(
+  '/users',
+  validate({ query: schemas.pagination }),
+  getAllUsers
+);
 
 // @desc    Update user status
 // @route   PUT /api/admin/users/:id/status
 // @access  Private (Admin only)
-router.put('/users/:id/status', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Update user status endpoint - to be implemented'
-  });
-}));
+router.put(
+  '/users/:id/status',
+  validate({ params: schemas.idParam }),
+  updateUserStatus
+);
+
+// @desc    Get all appointments
+// @route   GET /api/admin/appointments
+// @access  Private (Admin only)
+router.get(
+  '/appointments',
+  validate({
+    query: {
+      ...schemas.pagination,
+      ...schemas.appointmentFilters,
+    },
+  }),
+  getAllAppointments
+);
 
 // @desc    Get all transactions
 // @route   GET /api/admin/transactions
 // @access  Private (Admin only)
-router.get('/transactions', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Get all transactions endpoint - to be implemented'
-  });
-}));
+router.get(
+  '/transactions',
+  validate({ query: schemas.pagination }),
+  getAllTransactions
+);
+
+// @desc    Update professional status
+// @route   PUT /api/admin/professionals/:id/status
+// @access  Private (Admin only)
+router.put(
+  '/professionals/:id/status',
+  validate({ params: schemas.idParam }),
+  updateProfessionalStatus
+);
 
 // @desc    Get platform settings
 // @route   GET /api/admin/settings
 // @access  Private (Admin only)
-router.get('/settings', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Get platform settings endpoint - to be implemented'
-  });
-}));
+router.get('/settings', getSystemSettings);
 
 // @desc    Update platform settings
 // @route   PUT /api/admin/settings
 // @access  Private (Admin only)
-router.put('/settings', asyncHandler(async (req, res) => {
-  res.status(200).json({
-    success: true,
-    message: 'Update platform settings endpoint - to be implemented'
-  });
-}));
+router.put('/settings', updateSystemSettings);
 
 export default router;
